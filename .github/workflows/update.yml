@@ -1,0 +1,36 @@
+name: Update Nhap Kho Dashboard
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'   # Chạy mỗi 30 phút
+  workflow_dispatch:           # Cho phép chạy thủ công
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run dashboard script
+        env:
+          GSHEET_CREDENTIALS: ${{ secrets.GSHEET_CREDENTIALS }}
+        run: python generate_dashboard.py
+
+      - name: Commit and push
+        run: |
+          git config user.email "condor-bot@condor.vn"
+          git config user.name "Condor Bot"
+          git add index.html
+          git diff --staged --quiet || git commit -m \
+            "Auto update $(date +'%Y-%m-%d %H:%M' -d '+7 hours') ICT"
+          git push
