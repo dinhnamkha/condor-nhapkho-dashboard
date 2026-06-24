@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Condor VN — Báo Cáo Nhập Kho 2026</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --blue:#2563eb; --green:#059669; --amber:#d97706; --purple:#7c3aed;
+    --red:#dc2626; --cyan:#0891b2; --bg:#f1f5f9; --card:#ffffff;
+    --border:#e2e8f0; --text:#1e293b; --muted:#64748b; --light:#f8fafc;
+  }
+  body { font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+  .header {
+    background:linear-gradient(135deg,#1e293b 0%,#0f172a 60%,#1e3a5f 100%);
+    color:white; padding:18px 28px; display:flex; justify-content:space-between; align-items:center;
+    box-shadow:0 4px 20px rgba(0,0,0,.25);
+  }
+  .header-left { display:flex; align-items:center; gap:14px; }
+  .header-logo {
+    width:44px; height:44px; background:linear-gradient(135deg,#2563eb,#7c3aed);
+    border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.3rem;
+  }
+  .header h1 { font-size:1.25rem; font-weight:700; letter-spacing:-.01em; }
+  .header-sub { font-size:.75rem; opacity:.65; margin-top:2px; }
+  .header-right { text-align:right; }
+  .badge-live {
+    display:inline-flex; align-items:center; gap:5px;
+    background:rgba(5,150,105,.25); border:1px solid rgba(5,150,105,.5);
+    color:#6ee7b7; padding:4px 10px; border-radius:20px; font-size:.72rem; margin-bottom:4px;
+  }
+  .badge-live::before {
+    content:''; width:6px; height:6px; background:#34d399; border-radius:50%; animation:pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .updated-text { font-size:.7rem; opacity:.5; }
+
+  .kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; padding:20px 28px 8px; }
+  .kpi {
+    background:var(--card); border-radius:12px; padding:18px 20px;
+    box-shadow:0 1px 4px rgba(0,0,0,.07); border-top:3px solid transparent;
+    position:relative; overflow:hidden;
+  }
+  .kpi::after {
+    content:''; position:absolute; right:-10px; bottom:-10px;
+    width:64px; height:64px; border-radius:50%; opacity:.06;
+  }
+  .kpi.blue  { border-color:var(--blue);   } .kpi.blue::after  { background:var(--blue); }
+  .kpi.green { border-color:var(--green);  } .kpi.green::after { background:var(--green); }
+  .kpi.amber { border-color:var(--amber);  } .kpi.amber::after { background:var(--amber); }
+  .kpi.purple{ border-color:var(--purple); } .kpi.purple::after{ background:var(--purple); }
+  .kpi-icon  { font-size:1.4rem; margin-bottom:8px; }
+  .kpi-label { font-size:.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-weight:600; }
+  .kpi-value { font-size:1.75rem; font-weight:800; margin:4px 0 2px; line-height:1; }
+  .kpi-sub   { font-size:.72rem; color:var(--muted); }
+
+  .row { display:grid; gap:14px; padding:8px 28px; }
+  .row-2-1 { grid-template-columns:2fr 1fr; }
+  .row-1-1 { grid-template-columns:1fr 1fr; }
+  .pb28    { padding-bottom:28px; }
+
+  .card { background:var(--card); border-radius:12px; padding:18px 20px; box-shadow:0 1px 4px rgba(0,0,0,.07); }
+  .card-header {
+    display:flex; justify-content:space-between; align-items:flex-start;
+    margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid var(--border);
+  }
+  .card-title { font-size:.88rem; font-weight:700; color:var(--text); }
+  .card-sub   { font-size:.7rem; color:var(--muted); margin-top:2px; }
+
+  .tabs { display:flex; gap:6px; }
+  .tab {
+    padding:5px 12px; border-radius:6px; font-size:.72rem; font-weight:600;
+    border:1px solid var(--border); background:var(--light); color:var(--muted); cursor:pointer; transition:all .15s;
+  }
+  .tab:hover { border-color:var(--blue); color:var(--blue); }
+  .tab.active { background:var(--blue); color:white; border-color:var(--blue); }
+
+  .chart-wrap canvas { max-height:260px !important; }
+
+  .table-wrap { overflow-x:auto; margin-top:4px; }
+  table { width:100%; border-collapse:collapse; font-size:.78rem; }
+  th {
+    background:var(--light); padding:8px 10px; text-align:left; font-weight:600;
+    font-size:.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:.04em;
+    border-bottom:2px solid var(--border); white-space:nowrap;
+  }
+  td { padding:7px 10px; border-bottom:1px solid var(--border); white-space:nowrap; }
+  tr:hover td { background:var(--light); }
+  .num { text-align:right; font-variant-numeric:tabular-nums; }
+  .badge-to { display:inline-block; padding:2px 8px; border-radius:4px; font-size:.68rem; font-weight:700; }
+  .to-H { background:#dbeafe; color:#1d4ed8; }
+  .to-P { background:#dcfce7; color:#15803d; }
+  .to-K { background:#fef3c7; color:#b45309; }
+
+  .footer {
+    text-align:center; padding:16px; font-size:.7rem; color:var(--muted);
+    border-top:1px solid var(--border); margin-top:4px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-logo">🏭</div>
+    <div>
+      <h1>Condor Vietnam — Báo Cáo Nhập Kho</h1>
+      <div class="header-sub">入庫金額レポート ｜ KCN Bàu Bàng, Bình Dương</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="badge-live">AUTO UPDATE</div>
+    <div class="updated-text" id="updatedAt">Đang tải...</div>
+  </div>
+</div>
+
+<div class="kpi-grid">
+  <div class="kpi blue">  <div class="kpi-icon">📦</div><div class="kpi-label">Tổng giá trị nhập kho</div><div class="kpi-value" id="kv1">—</div><div class="kpi-sub">Toàn bộ dữ liệu</div></div>
+  <div class="kpi green"> <div class="kpi-icon">📅</div><div class="kpi-label">Tháng hiện tại</div>       <div class="kpi-value" id="kv2">—</div><div class="kpi-sub" id="kv2s">—</div></div>
+  <div class="kpi amber"> <div class="kpi-icon">📊</div><div class="kpi-label">Trung bình / ngày</div>    <div class="kpi-value" id="kv3">—</div><div class="kpi-sub" id="kv3s">—</div></div>
+  <div class="kpi purple"><div class="kpi-icon">🏆</div><div class="kpi-label">Tổ nhập nhiều nhất</div>   <div class="kpi-value" id="kv4">—</div><div class="kpi-sub" id="kv4s">—</div></div>
+</div>
+
+<div class="row row-2-1">
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">📈 Giá trị nhập kho theo thời gian</div>
+        <div class="card-sub">Đơn vị: USD</div>
+      </div>
+      <div class="tabs">
+        <button class="tab active" onclick="switchView('daily',this)">Theo ngày</button>
+        <button class="tab" onclick="switchView('cumMonth',this)">Luỹ kế tháng</button>
+        <button class="tab" onclick="switchView('cumYear',this)">Luỹ kế năm</button>
+      </div>
+    </div>
+    <div class="chart-wrap"><canvas id="chartMain"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <div><div class="card-title">🏭 Theo tổ sản xuất</div><div class="card-sub">Tỷ trọng giá trị (USD)</div></div>
+    </div>
+    <div class="chart-wrap"><canvas id="chartTo"></canvas></div>
+  </div>
+</div>
+
+<div class="row row-1-1">
+  <div class="card">
+    <div class="card-header">
+      <div><div class="card-title">🗓 Giá trị nhập kho theo tháng</div><div class="card-sub">Tổng theo tháng (USD)</div></div>
+    </div>
+    <div class="chart-wrap"><canvas id="chartMonthly"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <div><div class="card-title">🥇 Top 10 mặt hàng nhập nhiều nhất</div><div class="card-sub">Xếp hạng theo tổng thành tiền (USD)</div></div>
+    </div>
+    <div class="chart-wrap"><canvas id="chartTop"></canvas></div>
+  </div>
+</div>
+
+<div class="row pb28" style="grid-template-columns:1fr">
+  <div class="card">
+    <div class="card-header">
+      <div><div class="card-title">📋 Giao dịch nhập kho gần nhất</div><div class="card-sub">20 dòng mới nhất</div></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Ngày</th><th>Tổ</th><th>Mã SP</th><th>Tên sản phẩm</th>
+            <th class="num">SL</th><th class="num">Đơn giá (USD)</th><th class="num">Thành tiền (USD)</th>
+          </tr>
+        </thead>
+        <tbody id="recentBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  Condor Vietnam ｜ Phòng Tổng Vụ ｜ Dữ liệu từ AppSheet → Google Sheets → GitHub Pages ｜ Tự động cập nhật mỗi 30 phút
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  DỮ LIỆU MẪU — generate_dashboard.py sẽ thay bằng dữ liệu thực
+// ═══════════════════════════════════════════════════════════
+const UPDATED_AT = "24/06/2026 16:00 (dữ liệu mẫu)";
+
+const RAW_DATA = [
+  { ngay:"2026-01-05", to:"Housei",       matp:"03001390000", tentp:"Túi zozo BL TW 2",              soluong:500,  dongia:17.20, thanhtien:8600.00 },
+  { ngay:"2026-01-08", to:"Kinzoku",      matp:"03006320000", tentp:"Condor khung đựng rác MT 60",   soluong:80,   dongia:14.00, thanhtien:1120.00 },
+  { ngay:"2026-01-10", to:"Purasuchikku", matp:"02001160001", tentp:"VBB017 P Đầu lau bồn tắm",      soluong:1200, dongia:1.10,  thanhtien:1320.00 },
+  { ngay:"2026-01-12", to:"Housei",       matp:"03005780002", tentp:"Condor túi MT ECO Y-2 L BL",    soluong:300,  dongia:15.90, thanhtien:4770.00 },
+  { ngay:"2026-01-15", to:"Kinzoku",      matp:"29000090000", tentp:"Bánh xe Φ100 M16 không khoá",   soluong:400,  dongia:4.40,  thanhtien:1760.00 },
+  { ngay:"2026-01-18", to:"Purasuchikku", matp:"03000050000", tentp:"Túi rác lớn G",                 soluong:600,  dongia:11.50, thanhtien:6900.00 },
+  { ngay:"2026-01-20", to:"Housei",       matp:"03005770002", tentp:"Condor túi MT ECO Y-2 S BL",    soluong:450,  dongia:12.30, thanhtien:5535.00 },
+  { ngay:"2026-01-22", to:"Kinzoku",      matp:"03001810000", tentp:"Đế thảm gạt bùn L",             soluong:100,  dongia:18.80, thanhtien:1880.00 },
+  { ngay:"2026-01-25", to:"Purasuchikku", matp:"50002750000", tentp:"Quai xô phi 4 KO-97 Cr3+",      soluong:2000, dongia:0.50,  thanhtien:1000.00 },
+  { ngay:"2026-02-03", to:"Housei",       matp:"03001390000", tentp:"Túi zozo BL TW 2",              soluong:420,  dongia:17.20, thanhtien:7224.00 },
+  { ngay:"2026-02-06", to:"Kinzoku",      matp:"03006320000", tentp:"Condor khung đựng rác MT 60",   soluong:60,   dongia:14.00, thanhtien:840.00  },
+  { ngay:"2026-02-10", to:"Purasuchikku", matp:"02001160001", tentp:"VBB017 P Đầu lau bồn tắm",      soluong:1500, dongia:1.10,  thanhtien:1650.00 },
+  { ngay:"2026-02-14", to:"Housei",       matp:"03005780002", tentp:"Condor túi MT ECO Y-2 L BL",    soluong:280,  dongia:15.90, thanhtien:4452.00 },
+  { ngay:"2026-02-18", to:"Kinzoku",      matp:"03000050000", tentp:"Túi rác lớn G",                 soluong:500,  dongia:11.50, thanhtien:5750.00 },
+  { ngay:"2026-02-20", to:"Housei",       matp:"03005810000", tentp:"Condor xe đẩy rác System Cr3+", soluong:30,   dongia:74.30, thanhtien:2229.00 },
+  { ngay:"2026-02-25", to:"Purasuchikku", matp:"03005770002", tentp:"Condor túi MT ECO Y-2 S BL",    soluong:380,  dongia:12.30, thanhtien:4674.00 },
+  { ngay:"2026-03-04", to:"Housei",       matp:"03001390000", tentp:"Túi zozo BL TW 2",              soluong:550,  dongia:17.20, thanhtien:9460.00 },
+  { ngay:"2026-03-08", to:"Kinzoku",      matp:"03006340000", tentp:"Condor xe đẩy rác V-300MT",     soluong:15,   dongia:45.00, thanhtien:675.00  },
+  { ngay:"2026-03-12", to:"Purasuchikku", matp:"02001160001", tentp:"VBB017 P Đầu lau bồn tắm",      soluong:1800, dongia:1.10,  thanhtien:1980.00 },
+  { ngay:"2026-03-15", to:"Housei",       matp:"03005780002", tentp:"Condor túi MT ECO Y-2 L BL",    soluong:320,  dongia:15.90, thanhtien:5088.00 },
+  { ngay:"2026-03-18", to:"Kinzoku",      matp:"03001810000", tentp:"Đế thảm gạt bùn L",             soluong:120,  dongia:18.80, thanhtien:2256.00 },
+  { ngay:"2026-03-20", to:"Purasuchikku", matp:"03000050000", tentp:"Túi rác lớn G",                 soluong:700,  dongia:11.50, thanhtien:8050.00 },
+  { ngay:"2026-03-25", to:"Housei",       matp:"03005770002", tentp:"Condor túi MT ECO Y-2 S BL",    soluong:500,  dongia:12.30, thanhtien:6150.00 },
+  { ngay:"2026-04-03", to:"Housei",       matp:"03001390000", tentp:"Túi zozo BL TW 2",              soluong:480,  dongia:17.20, thanhtien:8256.00 },
+  { ngay:"2026-04-07", to:"Kinzoku",      matp:"03006320000", tentp:"Condor khung đựng rác MT 60",   soluong:90,   dongia:14.00, thanhtien:1260.00 },
+  { ngay:"2026-04-12", to:"Purasuchikku", matp:"02001160001", tentp:"VBB017 P Đầu lau bồn tắm",      soluong:1600, dongia:1.10,  thanhtien:1760.00 },
+  { ngay:"2026-04-17", to:"Housei",       matp:"03005780002", tentp:"Condor túi MT ECO Y-2 L BL",    soluong:350,  dongia:15.90, thanhtien:5565.00 },
+  { ngay:"2026-04-22", to:"Kinzoku",      matp:"29000090000", tentp:"Bánh xe Φ100 M16 không khoá",   soluong:500,  dongia:4.40,  thanhtien:2200.00 },
+  { ngay:"2026-04-25", to:"Purasuchikku", matp:"03000050000", tentp:"Túi rác lớn G",                 soluong:650,  dongia:11.50, thanhtien:7475.00 },
+  { ngay:"2026-05-05", to:"Housei",       matp:"03001390000", tentp:"Túi zozo BL TW 2",              soluong:600,  dongia:17.20, thanhtien:10320.00},
+  { ngay:"2026-05-09", to:"Kinzoku",      matp:"03006340000", tentp:"Condor xe đẩy rác V-300MT",     soluong:20,   dongia:45.00, thanhtien:900.00  },
+  { ngay:"2026-05-14", to:"Purasuchikku", matp:"02001160001", tentp:"VBB017 P Đầu lau bồn tắm",      soluong:2000, dongia:1.10,  thanhtien:2200.00 },
+  { ngay:"2026-05-19", to:"Housei",       matp:"03005780002", tentp:"Condor túi MT ECO Y-2 L BL",    soluong:400,  dongia:15.90, thanhtien:6360.00 },
+  { ngay:"2026-05-22", to:"Kinzoku",      matp:"03001810000", tentp:"Đế thảm gạt bùn L",             soluong:150,  dongia:18.80, thanhtien:2820.00 },
+  { ngay:"2026-05-27", to:"Purasuchikku", matp:"03000050000", tentp:"Túi rác lớn G",                 soluong:800,  dongia:11.50, thanhtien:9200.00 },
+  { ngay:"2026-06-03", to:"Housei",       matp:"03001390000", tentp:"Túi zozo BL TW 2",              soluong:350,  dongia:17.20, thanhtien:6020.00 },
+  { ngay:"2026-06-07", to:"Kinzoku",      matp:"03006320000", tentp:"Condor khung đựng rác MT 60",   soluong:50,   dongia:14.00, thanhtien:700.00  },
+  { ngay:"2026-06-11", to:"Purasuchikku", matp:"02001160001", tentp:"VBB017 P Đầu lau bồn tắm",      soluong:1400, dongia:1.10,  thanhtien:1540.00 },
+  { ngay:"2026-06-16", to:"Housei",       matp:"03005810000", tentp:"Condor xe đẩy rác System Cr3+", soluong:25,   dongia:74.30, thanhtien:1857.50 },
+  { ngay:"2026-06-20", to:"Kinzoku",      matp:"29000090000", tentp:"Bánh xe Φ100 M16 không khoá",   soluong:300,  dongia:4.40,  thanhtien:1320.00 },
+  { ngay:"2026-06-23", to:"Purasuchikku", matp:"02001160001", tentp:"VBB017 P Đầu lau bồn tắm",      soluong:2160, dongia:1.10,  thanhtien:2376.00 },
+  { ngay:"2026-06-23", to:"Kinzoku",      matp:"03006320000", tentp:"Condor khung đựng rác MT 60",   soluong:20,   dongia:14.00, thanhtien:280.00  },
+  { ngay:"2026-06-23", to:"Kinzoku",      matp:"03001810000", tentp:"Đế thảm gạt bùn L",             soluong:59,   dongia:18.80, thanhtien:1109.20 },
+  { ngay:"2026-06-23", to:"Kinzoku",      matp:"50002750000", tentp:"Quai xô phi 4 KO-97 Cr3+",      soluong:1495, dongia:0.50,  thanhtien:747.50  },
+  { ngay:"2026-06-23", to:"Housei",       matp:"03001390000", tentp:"Túi zozo BL TW 2",              soluong:210,  dongia:17.20, thanhtien:3612.00 },
+  { ngay:"2026-06-24", to:"Kinzoku",      matp:"01000280000", tentp:"Ống nối dài 0.9M V",            soluong:100,  dongia:5.00,  thanhtien:500.00  },
+  { ngay:"2026-06-24", to:"Kinzoku",      matp:"03006120000", tentp:"Bạt trùm xe đẩy 002 OR",        soluong:10,   dongia:45.00, thanhtien:450.00  },
+  { ngay:"2026-06-24", to:"Kinzoku",      matp:"29000090000", tentp:"Bánh xe Φ100 M16 không khoá",   soluong:10,   dongia:4.40,  thanhtien:44.00   },
+  { ngay:"2026-06-24", to:"Kinzoku",      matp:"03000050000", tentp:"Túi rác lớn G",                 soluong:10,   dongia:11.50, thanhtien:115.00  },
+];
+
+// ─── Format USD ───
+const fmtUSD = v => '$' + v.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+const fmtUSDShort = v => v >= 1000 ? '$' + (v/1000).toFixed(1) + 'K' : '$' + v.toFixed(2);
+
+document.getElementById('updatedAt').textContent = 'Cập nhật: ' + UPDATED_AT;
+
+// Group by date
+const byDate = {};
+RAW_DATA.forEach(d => { byDate[d.ngay] = (byDate[d.ngay]||0) + d.thanhtien; });
+const sortedDates = Object.keys(byDate).sort();
+const dailyVals = sortedDates.map(d => byDate[d]);
+
+// Cumulative month / year
+const cumMonth = [], monthTracker = {};
+const cumYear  = [], yearTracker  = {};
+sortedDates.forEach((d,i) => {
+  const m = d.substring(0,7), y = d.substring(0,4);
+  monthTracker[m] = (monthTracker[m]||0) + dailyVals[i]; cumMonth.push(monthTracker[m]);
+  yearTracker[y]  = (yearTracker[y] ||0) + dailyVals[i]; cumYear.push(yearTracker[y]);
+});
+
+const shortLabels = sortedDates.map(d => { const p=d.split('-'); return p[2]+'/'+p[1]; });
+
+const monthTotals = {};
+RAW_DATA.forEach(d => { const m=d.ngay.substring(0,7); monthTotals[m]=(monthTotals[m]||0)+d.thanhtien; });
+const monthKeys = Object.keys(monthTotals).sort();
+
+const toTotals = {};
+RAW_DATA.forEach(d => { toTotals[d.to]=(toTotals[d.to]||0)+d.thanhtien; });
+
+const prodTotals = {};
+RAW_DATA.forEach(d => { prodTotals[d.tentp]=(prodTotals[d.tentp]||0)+d.thanhtien; });
+const top10 = Object.entries(prodTotals).sort((a,b)=>b[1]-a[1]).slice(0,10);
+
+// KPI
+const total = RAW_DATA.reduce((s,d)=>s+d.thanhtien,0);
+const currentMonth = monthKeys[monthKeys.length-1];
+const currentMonthVal = monthTotals[currentMonth];
+const avgPerDay = total / sortedDates.length;
+const topTo = Object.entries(toTotals).sort((a,b)=>b[1]-a[1])[0];
+
+document.getElementById('kv1').textContent = fmtUSDShort(total);
+document.getElementById('kv2').textContent = 'T'+currentMonth.split('-')[1]+'/'+currentMonth.split('-')[0].slice(2);
+document.getElementById('kv2s').textContent = fmtUSD(currentMonthVal);
+document.getElementById('kv3').textContent = fmtUSDShort(avgPerDay);
+document.getElementById('kv3s').textContent = sortedDates.length + ' ngày có dữ liệu';
+document.getElementById('kv4').textContent = topTo[0];
+document.getElementById('kv4s').textContent = fmtUSDShort(topTo[1]) + ' (' + Math.round(topTo[1]/total*100) + '%)';
+
+// Charts
+const C6 = ['#2563eb','#059669','#d97706','#7c3aed','#dc2626','#0891b2'];
+
+let mainChart;
+function buildMainChart(mode) {
+  if (mainChart) mainChart.destroy();
+  const isBar = mode==='daily';
+  const data  = mode==='daily' ? dailyVals : mode==='cumMonth' ? cumMonth : cumYear;
+  const color = mode==='daily' ? '#2563eb' : mode==='cumMonth' ? '#059669' : '#7c3aed';
+  const lbl   = mode==='daily' ? 'USD/ngày' : mode==='cumMonth' ? 'Luỹ kế tháng (USD)' : 'Luỹ kế năm (USD)';
+  mainChart = new Chart(document.getElementById('chartMain'), {
+    type: isBar ? 'bar' : 'line',
+    data: { labels: shortLabels, datasets: [{
+      label: lbl, data,
+      backgroundColor: isBar ? color+'99' : color+'22',
+      borderColor: color, borderWidth: isBar ? 0 : 2,
+      fill: !isBar, tension: .35, pointRadius: isBar ? 0 : 3, pointHoverRadius: 5,
+      borderRadius: isBar ? 4 : 0,
+    }]},
+    options: {
+      responsive:true, maintainAspectRatio:true,
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{
+        label: ctx => ' ' + fmtUSD(ctx.parsed.y)
+      }}},
+      scales:{
+        x:{ grid:{display:false}, ticks:{maxTicksLimit:12, font:{size:10}} },
+        y:{ grid:{color:'#f1f5f9'}, ticks:{font:{size:10},
+          callback: v => '$'+(v>=1000?(v/1000).toFixed(0)+'K':v.toFixed(0))
+        }}
+      }
+    }
+  });
+}
+buildMainChart('daily');
+
+function switchView(mode,el) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  buildMainChart(mode);
+}
+
+new Chart(document.getElementById('chartTo'), {
+  type:'doughnut',
+  data:{ labels:Object.keys(toTotals), datasets:[{ data:Object.values(toTotals), backgroundColor:C6, borderWidth:2, borderColor:'#fff' }]},
+  options:{ responsive:true, maintainAspectRatio:true,
+    plugins:{ legend:{position:'bottom',labels:{font:{size:11},padding:10}},
+      tooltip:{callbacks:{ label: ctx => ' '+ctx.label+': '+fmtUSD(ctx.parsed) }} },
+    cutout:'60%'
+  }
+});
+
+new Chart(document.getElementById('chartMonthly'), {
+  type:'bar',
+  data:{ labels:monthKeys.map(m=>{ const[y,mo]=m.split('-'); return 'T'+parseInt(mo)+'/'+y.slice(2); }),
+    datasets:[{ label:'USD', data:monthKeys.map(m=>monthTotals[m]),
+      backgroundColor:C6[0]+'cc', borderRadius:6, borderSkipped:false }]},
+  options:{ responsive:true, maintainAspectRatio:true,
+    plugins:{ legend:{display:false}, tooltip:{callbacks:{ label: ctx => ' '+fmtUSD(ctx.parsed.y) }}},
+    scales:{
+      x:{ grid:{display:false}, ticks:{font:{size:10}} },
+      y:{ grid:{color:'#f1f5f9'}, ticks:{font:{size:10}, callback: v=>'$'+(v>=1000?(v/1000).toFixed(0)+'K':v) }}
+    }
+  }
+});
+
+new Chart(document.getElementById('chartTop'), {
+  type:'bar',
+  data:{ labels:top10.map(([n])=>n.length>24?n.substring(0,24)+'…':n),
+    datasets:[{ label:'USD', data:top10.map(([,v])=>v),
+      backgroundColor:C6[2]+'cc', borderRadius:4 }]},
+  options:{ indexAxis:'y', responsive:true, maintainAspectRatio:true,
+    plugins:{ legend:{display:false}, tooltip:{callbacks:{ label: ctx => ' '+fmtUSD(ctx.parsed.x) }}},
+    scales:{
+      x:{ grid:{color:'#f1f5f9'}, ticks:{font:{size:9}, callback: v=>'$'+(v>=1000?(v/1000).toFixed(0)+'K':v) }},
+      y:{ grid:{display:false}, ticks:{font:{size:9}} }
+    }
+  }
+});
+
+// Recent table
+const toClass = { Housei:'to-H', Purasuchikku:'to-P', Kinzoku:'to-K' };
+const tbody = document.getElementById('recentBody');
+[...RAW_DATA].reverse().slice(0,20).forEach(d => {
+  const [y,mo,dd] = d.ngay.split('-');
+  tbody.innerHTML += `<tr>
+    <td>${dd}/${mo}/${y}</td>
+    <td><span class="badge-to ${toClass[d.to]||''}">${d.to}</span></td>
+    <td style="font-family:monospace;font-size:.75rem">${d.matp}</td>
+    <td>${d.tentp}</td>
+    <td class="num">${d.soluong.toLocaleString('en-US')}</td>
+    <td class="num">${fmtUSD(d.dongia)}</td>
+    <td class="num" style="font-weight:600">${fmtUSD(d.thanhtien)}</td>
+  </tr>`;
+});
+</script>
+</body>
+</html>
