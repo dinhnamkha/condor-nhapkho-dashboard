@@ -57,18 +57,21 @@ updated_at = datetime.now().strftime('%d/%m/%Y %H:%M')
 with open('index.html', 'r', encoding='utf-8') as f:
     html = f.read()
 
+# Replace UPDATED_AT bang regex (khong co ky tu dac biet)
 html = re.sub(
     r'const UPDATED_AT = "[^"]*";',
     'const UPDATED_AT = "' + updated_at + '";',
     html
 )
 
-html = re.sub(
-    r'const RAW_DATA = \[.*?\];',
-    'const RAW_DATA = ' + raw_json + ';',
-    html,
-    flags=re.DOTALL
-)
+# Replace RAW_DATA bang string find (tranh loi regex voi Unicode)
+start_marker = 'const RAW_DATA = ['
+end_marker   = '];'
+
+start_pos = html.find(start_marker)
+end_pos   = html.find(end_marker, start_pos) + len(end_marker)
+
+html = html[:start_pos] + 'const RAW_DATA = ' + raw_json + ';' + html[end_pos:]
 
 with open('index.html', 'w', encoding='utf-8') as f:
     f.write(html)
