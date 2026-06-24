@@ -189,59 +189,9 @@
 // ═══════════════════════════════════════════════════════════
 //  DỮ LIỆU MẪU — generate_dashboard.py sẽ thay bằng dữ liệu thực
 // ═══════════════════════════════════════════════════════════
-const UPDATED_AT = "24/06/2026 16:00 (dữ liệu mẫu)";
+const UPDATED_AT = "24/06/2026 09:10";
 
-const RAW_DATA = [
-  { ngay:"2026-01-05", to:"Housei",       matp:"03001390000", tentp:"Túi zozo BL TW 2",              soluong:500,  dongia:17.20, thanhtien:8600.00 },
-  { ngay:"2026-01-08", to:"Kinzoku",      matp:"03006320000", tentp:"Condor khung đựng rác MT 60",   soluong:80,   dongia:14.00, thanhtien:1120.00 },
-  { ngay:"2026-01-10", to:"Purasuchikku", matp:"02001160001", tentp:"VBB017 P Đầu lau bồn tắm",      soluong:1200, dongia:1.10,  thanhtien:1320.00 },
-  { ngay:"2026-01-12", to:"Housei",       matp:"03005780002", tentp:"Condor túi MT ECO Y-2 L BL",    soluong:300,  dongia:15.90, thanhtien:4770.00 },
-  { ngay:"2026-01-15", to:"Kinzoku",      matp:"29000090000", tentp:"Bánh xe Φ100 M16 không khoá",   soluong:400,  dongia:4.40,  thanhtien:1760.00 },
-  { ngay:"2026-01-18", to:"Purasuchikku", matp:"03000050000", tentp:"Túi rác lớn G",                 soluong:600,  dongia:11.50, thanhtien:6900.00 },
-  { ngay:"2026-01-20", to:"Housei",       matp:"03005770002", tentp:"Condor túi MT ECO Y-2 S BL",    soluong:450,  dongia:12.30, thanhtien:5535.00 },
-  { ngay:"2026-01-22", to:"Kinzoku",      matp:"03001810000", tentp:"Đế thảm gạt bùn L",             soluong:100,  dongia:18.80, thanhtien:1880.00 },
-  { ngay:"2026-01-25", to:"Purasuchikku", matp:"50002750000", tentp:"Quai xô phi 4 KO-97 Cr3+",      soluong:2000, dongia:0.50,  thanhtien:1000.00 },
-  { ngay:"2026-02-03", to:"Housei",       matp:"03001390000", tentp:"Túi zozo BL TW 2",              soluong:420,  dongia:17.20, thanhtien:7224.00 },
-  { ngay:"2026-02-06", to:"Kinzoku",      matp:"03006320000", tentp:"Condor khung đựng rác MT 60",   soluong:60,   dongia:14.00, thanhtien:840.00  },
-  { ngay:"2026-02-10", to:"Purasuchikku", matp:"02001160001", tentp:"VBB017 P Đầu lau bồn tắm",      soluong:1500, dongia:1.10,  thanhtien:1650.00 },
-  { ngay:"2026-02-14", to:"Housei",       matp:"03005780002", tentp:"Condor túi MT ECO Y-2 L BL",    soluong:280,  dongia:15.90, thanhtien:4452.00 },
-  { ngay:"2026-02-18", to:"Kinzoku",      matp:"03000050000", tentp:"Túi rác lớn G",                 soluong:500,  dongia:11.50, thanhtien:5750.00 },
-  { ngay:"2026-02-20", to:"Housei",       matp:"03005810000", tentp:"Condor xe đẩy rác System Cr3+", soluong:30,   dongia:74.30, thanhtien:2229.00 },
-  { ngay:"2026-02-25", to:"Purasuchikku", matp:"03005770002", tentp:"Condor túi MT ECO Y-2 S BL",    soluong:380,  dongia:12.30, thanhtien:4674.00 },
-  { ngay:"2026-03-04", to:"Housei",       matp:"03001390000", tentp:"Túi zozo BL TW 2",              soluong:550,  dongia:17.20, thanhtien:9460.00 },
-  { ngay:"2026-03-08", to:"Kinzoku",      matp:"03006340000", tentp:"Condor xe đẩy rác V-300MT",     soluong:15,   dongia:45.00, thanhtien:675.00  },
-  { ngay:"2026-03-12", to:"Purasuchikku", matp:"02001160001", tentp:"VBB017 P Đầu lau bồn tắm",      soluong:1800, dongia:1.10,  thanhtien:1980.00 },
-  { ngay:"2026-03-15", to:"Housei",       matp:"03005780002", tentp:"Condor túi MT ECO Y-2 L BL",    soluong:320,  dongia:15.90, thanhtien:5088.00 },
-  { ngay:"2026-03-18", to:"Kinzoku",      matp:"03001810000", tentp:"Đế thảm gạt bùn L",             soluong:120,  dongia:18.80, thanhtien:2256.00 },
-  { ngay:"2026-03-20", to:"Purasuchikku", matp:"03000050000", tentp:"Túi rác lớn G",                 soluong:700,  dongia:11.50, thanhtien:8050.00 },
-  { ngay:"2026-03-25", to:"Housei",       matp:"03005770002", tentp:"Condor túi MT ECO Y-2 S BL",    soluong:500,  dongia:12.30, thanhtien:6150.00 },
-  { ngay:"2026-04-03", to:"Housei",       matp:"03001390000", tentp:"Túi zozo BL TW 2",              soluong:480,  dongia:17.20, thanhtien:8256.00 },
-  { ngay:"2026-04-07", to:"Kinzoku",      matp:"03006320000", tentp:"Condor khung đựng rác MT 60",   soluong:90,   dongia:14.00, thanhtien:1260.00 },
-  { ngay:"2026-04-12", to:"Purasuchikku", matp:"02001160001", tentp:"VBB017 P Đầu lau bồn tắm",      soluong:1600, dongia:1.10,  thanhtien:1760.00 },
-  { ngay:"2026-04-17", to:"Housei",       matp:"03005780002", tentp:"Condor túi MT ECO Y-2 L BL",    soluong:350,  dongia:15.90, thanhtien:5565.00 },
-  { ngay:"2026-04-22", to:"Kinzoku",      matp:"29000090000", tentp:"Bánh xe Φ100 M16 không khoá",   soluong:500,  dongia:4.40,  thanhtien:2200.00 },
-  { ngay:"2026-04-25", to:"Purasuchikku", matp:"03000050000", tentp:"Túi rác lớn G",                 soluong:650,  dongia:11.50, thanhtien:7475.00 },
-  { ngay:"2026-05-05", to:"Housei",       matp:"03001390000", tentp:"Túi zozo BL TW 2",              soluong:600,  dongia:17.20, thanhtien:10320.00},
-  { ngay:"2026-05-09", to:"Kinzoku",      matp:"03006340000", tentp:"Condor xe đẩy rác V-300MT",     soluong:20,   dongia:45.00, thanhtien:900.00  },
-  { ngay:"2026-05-14", to:"Purasuchikku", matp:"02001160001", tentp:"VBB017 P Đầu lau bồn tắm",      soluong:2000, dongia:1.10,  thanhtien:2200.00 },
-  { ngay:"2026-05-19", to:"Housei",       matp:"03005780002", tentp:"Condor túi MT ECO Y-2 L BL",    soluong:400,  dongia:15.90, thanhtien:6360.00 },
-  { ngay:"2026-05-22", to:"Kinzoku",      matp:"03001810000", tentp:"Đế thảm gạt bùn L",             soluong:150,  dongia:18.80, thanhtien:2820.00 },
-  { ngay:"2026-05-27", to:"Purasuchikku", matp:"03000050000", tentp:"Túi rác lớn G",                 soluong:800,  dongia:11.50, thanhtien:9200.00 },
-  { ngay:"2026-06-03", to:"Housei",       matp:"03001390000", tentp:"Túi zozo BL TW 2",              soluong:350,  dongia:17.20, thanhtien:6020.00 },
-  { ngay:"2026-06-07", to:"Kinzoku",      matp:"03006320000", tentp:"Condor khung đựng rác MT 60",   soluong:50,   dongia:14.00, thanhtien:700.00  },
-  { ngay:"2026-06-11", to:"Purasuchikku", matp:"02001160001", tentp:"VBB017 P Đầu lau bồn tắm",      soluong:1400, dongia:1.10,  thanhtien:1540.00 },
-  { ngay:"2026-06-16", to:"Housei",       matp:"03005810000", tentp:"Condor xe đẩy rác System Cr3+", soluong:25,   dongia:74.30, thanhtien:1857.50 },
-  { ngay:"2026-06-20", to:"Kinzoku",      matp:"29000090000", tentp:"Bánh xe Φ100 M16 không khoá",   soluong:300,  dongia:4.40,  thanhtien:1320.00 },
-  { ngay:"2026-06-23", to:"Purasuchikku", matp:"02001160001", tentp:"VBB017 P Đầu lau bồn tắm",      soluong:2160, dongia:1.10,  thanhtien:2376.00 },
-  { ngay:"2026-06-23", to:"Kinzoku",      matp:"03006320000", tentp:"Condor khung đựng rác MT 60",   soluong:20,   dongia:14.00, thanhtien:280.00  },
-  { ngay:"2026-06-23", to:"Kinzoku",      matp:"03001810000", tentp:"Đế thảm gạt bùn L",             soluong:59,   dongia:18.80, thanhtien:1109.20 },
-  { ngay:"2026-06-23", to:"Kinzoku",      matp:"50002750000", tentp:"Quai xô phi 4 KO-97 Cr3+",      soluong:1495, dongia:0.50,  thanhtien:747.50  },
-  { ngay:"2026-06-23", to:"Housei",       matp:"03001390000", tentp:"Túi zozo BL TW 2",              soluong:210,  dongia:17.20, thanhtien:3612.00 },
-  { ngay:"2026-06-24", to:"Kinzoku",      matp:"01000280000", tentp:"Ống nối dài 0.9M V",            soluong:100,  dongia:5.00,  thanhtien:500.00  },
-  { ngay:"2026-06-24", to:"Kinzoku",      matp:"03006120000", tentp:"Bạt trùm xe đẩy 002 OR",        soluong:10,   dongia:45.00, thanhtien:450.00  },
-  { ngay:"2026-06-24", to:"Kinzoku",      matp:"29000090000", tentp:"Bánh xe Φ100 M16 không khoá",   soluong:10,   dongia:4.40,  thanhtien:44.00   },
-  { ngay:"2026-06-24", to:"Kinzoku",      matp:"03000050000", tentp:"Túi rác lớn G",                 soluong:10,   dongia:11.50, thanhtien:115.00  },
-];
+const RAW_DATA = [{"ngay": "2026-06-23", "to": "Purasuchikku", "matp": "02001160001", "tentp": "VBB017 P \u0110\u1ea7u lau b\u1ed3n t\u1eafm", "soluong": 2160, "dongia": 1.1, "thanhtien": 2376}, {"ngay": "2026-06-23", "to": "Kinzoku", "matp": "03006320000", "tentp": "Condor khung \u0111\u1ef1ng r\u00e1c MT 60", "soluong": 20, "dongia": 14.0, "thanhtien": 280}, {"ngay": "2026-06-23", "to": "Kinzoku", "matp": "03001810000", "tentp": "\u0110\u1ebf th\u1ea3m g\u1ea1t b\u00f9n L", "soluong": 59, "dongia": 18.8, "thanhtien": 1109}, {"ngay": "2026-06-23", "to": "Kinzoku", "matp": "50002750000", "tentp": "Quai x\u00f4 phi 4 KO-97 HC/21 Cr3+ 7 m\u00e0u", "soluong": 1495, "dongia": 0.5, "thanhtien": 703}, {"ngay": "2026-06-23", "to": "Housei", "matp": "03001390000", "tentp": "T\u00fai zozo BL TW 2", "soluong": 210, "dongia": 17.2, "thanhtien": 3608}, {"ngay": "2026-06-24", "to": "Kinzoku", "matp": "01000280000", "tentp": "\u1ed0ng n\u1ed1i d\u00e0i 0.9M V", "soluong": 100, "dongia": 5.0, "thanhtien": 502}, {"ngay": "2026-06-24", "to": "Kinzoku", "matp": "03006120000", "tentp": "Becchuu-B\u1ea1t tr\u00f9m xe \u0111\u1ea9y 002 MSTR038-18 OR", "soluong": 10, "dongia": 45.0, "thanhtien": 450}, {"ngay": "2026-06-24", "to": "Kinzoku", "matp": "29000090000", "tentp": "B\u00e1nh xe \u03a6 100 M16 kh\u00f4ng kho\u00e1", "soluong": 10, "dongia": 4.4, "thanhtien": 44}, {"ngay": "2026-06-24", "to": "Kinzoku", "matp": "03000050000", "tentp": "T\u00fai r\u00e1c l\u1edbn G", "soluong": 10, "dongia": 11.5, "thanhtien": 115}, {"ngay": "2026-06-24", "to": "Kinzoku", "matp": "03001560002", "tentp": "T\u00fai r\u00e1c Re Y-2 S R", "soluong": 152, "dongia": 12.7, "thanhtien": 1930}];
 
 // ─── Format USD ───
 const fmtUSD = v => '$' + v.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
