@@ -2,9 +2,9 @@ import gspread, json, os, re
 from google.oauth2.service_account import Credentials
 import pandas as pd
 import numpy as np
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
-# 1. Credentials
+# 1. Credentials tu GitHub Secret
 creds_info = json.loads(os.environ['GSHEET_CREDENTIALS'])
 creds = Credentials.from_service_account_info(
     creds_info,
@@ -12,7 +12,7 @@ creds = Credentials.from_service_account_info(
 )
 client = gspread.authorize(creds)
 
-# 2. Doc tab Data
+# 2. Doc tab Data (chu D hoa)
 SHEET_ID = '1VjLAd980HSDDMghANst8UtT09H5bH3pa_lhSm6054uY'
 ws = client.open_by_key(SHEET_ID).worksheet('Data')
 all_values = ws.get_all_values()
@@ -51,13 +51,14 @@ raw_records = df.sort_values('Ngay').rename(columns={
 })[['ngay','to','matp','tentp','soluong','dongia','thanhtien']].to_dict('records')
 
 raw_json   = json.dumps(raw_records, default=serialize)
-updated_at = datetime.now().strftime('%d/%m/%Y %H:%M')
+ICT = timezone(timedelta(hours=7))
+updated_at = datetime.now(ICT).strftime('%d/%m/%Y %H:%M')
 
 # 5. Inject vao HTML
 with open('index.html', 'r', encoding='utf-8') as f:
     html = f.read()
 
-# Replace UPDATED_AT bang regex (khong co ky tu dac biet)
+# Replace UPDATED_AT bang regex
 html = re.sub(
     r'const UPDATED_AT = "[^"]*";',
     'const UPDATED_AT = "' + updated_at + '";',
@@ -67,10 +68,8 @@ html = re.sub(
 # Replace RAW_DATA bang string find (tranh loi regex voi Unicode)
 start_marker = 'const RAW_DATA = ['
 end_marker   = '];'
-
 start_pos = html.find(start_marker)
 end_pos   = html.find(end_marker, start_pos) + len(end_marker)
-
 html = html[:start_pos] + 'const RAW_DATA = ' + raw_json + ';' + html[end_pos:]
 
 with open('index.html', 'w', encoding='utf-8') as f:
