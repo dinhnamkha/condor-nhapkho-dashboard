@@ -34,6 +34,11 @@ df['Thanhtien'] = pd.to_numeric(
 df['Soluong'] = pd.to_numeric(
     df['Soluong'].astype(str).str.replace('.', '', regex=False),
     errors='coerce').fillna(0)
+# Dam bao co cot Tenjp, neu khong co thi de trong
+if 'Tenjp' not in df.columns:
+    df['Tenjp'] = ''
+else:
+    df['Tenjp'] = df['Tenjp'].fillna('').astype(str).str.strip()
 df['Thang'] = df['Ngay'].dt.to_period('M').astype(str)
 df['Nam']   = df['Ngay'].dt.year
 
@@ -46,9 +51,9 @@ def serialize(obj):
 
 raw_records = df.sort_values('Ngay').rename(columns={
     'Ngay':'ngay','To':'to','Matp':'matp',
-    'Tentp':'tentp','Soluong':'soluong',
+    'Tentp':'tentp','Tenjp':'tenjp','Soluong':'soluong',
     'Dongia':'dongia','Thanhtien':'thanhtien'
-})[['ngay','to','matp','tentp','soluong','dongia','thanhtien']].to_dict('records')
+})[['ngay','to','matp','tentp','tenjp','soluong','dongia','thanhtien']].to_dict('records')
 
 raw_json   = json.dumps(raw_records, default=serialize)
 ICT = timezone(timedelta(hours=7))
