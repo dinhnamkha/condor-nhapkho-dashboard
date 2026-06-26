@@ -34,6 +34,7 @@ df['Thanhtien'] = pd.to_numeric(
 df['Soluong'] = pd.to_numeric(
     df['Soluong'].astype(str).str.replace('.', '', regex=False),
     errors='coerce').fillna(0)
+# Dam bao co cot Tenjp, neu khong co thi de trong
 if 'Tenjp' not in df.columns:
     df['Tenjp'] = ''
 else:
@@ -54,43 +55,29 @@ raw_records = df.sort_values('Ngay').rename(columns={
     'Dongia':'dongia','Thanhtien':'thanhtien'
 })[['ngay','to','matp','tentp','tenjp','soluong','dongia','thanhtien']].to_dict('records')
 
-raw_json   = json.dumps(raw_records, default=serialize, ensure_ascii=False)
-ICT        = timezone(timedelta(hours=7))
+raw_json   = json.dumps(raw_records, default=serialize)
+ICT = timezone(timedelta(hours=7))
 updated_at = datetime.now(ICT).strftime('%d/%m/%Y %H:%M')
 
 # 5. Inject vao HTML
 with open('index.html', 'r', encoding='utf-8') as f:
     html = f.read()
 
-# --- Replace UPDATED_AT ---
+# Replace UPDATED_AT bang regex
 html = re.sub(
     r'const UPDATED_AT = "[^"]*";',
     'const UPDATED_AT = "' + updated_at + '";',
     html
 )
 
-# --- Replace RAW_DATA ---
-# Dung marker chinh xac: tu "const RAW_DATA = [" den "];\n\n// "
-# De tranh khop sai voi ]; khac trong file
-START = 'const RAW_DATA = ['
-END   = '];\n\n// '
-
-start_pos = html.find(START)
-end_pos   = html.find(END, start_pos)
-
-if start_pos == -1:
-    print("ERROR: Khong tim thay marker 'const RAW_DATA = ['")
-    exit(1)
-if end_pos == -1:
-    # Fallback: tim ]; gan nhat sau START
-    end_pos = html.find('];', start_pos)
-    html = html[:start_pos] + 'const RAW_DATA = ' + raw_json + ';' + html[end_pos+2:]
-else:
-    html = html[:start_pos] + 'const RAW_DATA = ' + raw_json + ';\n\n// ' + html[end_pos + len(END):]
-
-print(f"RAW_DATA injected: {len(raw_records)} records")
+# Replace RAW_DATA bang string find (tranh loi regex voi Unicode)
+start_marker = 'const RAW_DATA = ['
+end_marker   = '];'
+start_pos = html.find(start_marker)
+end_pos   = html.find(end_marker, start_pos) + len(end_marker)
+html = html[:start_pos] + 'const RAW_DATA = ' + raw_json + ';' + html[end_pos:]
 
 with open('index.html', 'w', encoding='utf-8') as f:
     f.write(html)
 
-print(f"Done: {updated_at} | Total USD: {df.Thanhtien.sum():,.2f}")
+print("Done:", updated_at, "| Total USD:", df.Thanhtien.sum())
