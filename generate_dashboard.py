@@ -64,10 +64,15 @@ try:
             return f"{parts[1]}-{parts[0].zfill(2)}"
         return t
     df_kh['Thangsx'] = df_kh['Thangsx'].apply(parse_thang)
+    # Xu ly cot Tenjp neu co
+    if 'Tenjp' not in df_kh.columns:
+        df_kh['Tenjp'] = ''
+    else:
+        df_kh['Tenjp'] = df_kh['Tenjp'].fillna('').astype(str).str.strip()
     kh_records = df_kh.rename(columns={
-        'Matp':'matp','Tentp':'tentp','Nhom':'nhom',
+        'Matp':'matp','Tentp':'tentp','Tenjp':'tenjp','Nhom':'nhom',
         'To':'to','Soluong':'soluong_kh','Thangsx':'thangsx'
-    })[['matp','tentp','nhom','to','soluong_kh','thangsx']].to_dict('records')
+    })[['matp','tentp','tenjp','nhom','to','soluong_kh','thangsx']].to_dict('records')
     print(f"KH_DATA loaded: {len(kh_records)} records")
 except Exception as e:
     kh_records = []
