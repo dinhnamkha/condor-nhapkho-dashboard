@@ -63,16 +63,24 @@ try:
                 return f"{parts[0]}-{parts[1].zfill(2)}"
             return f"{parts[1]}-{parts[0].zfill(2)}"
         return t
-    df_kh['Thangsx'] = df_kh['Thangsx'].apply(parse_thang)
-    # Xu ly cot Tenjp neu co
+    # df_kh['Thangsx'] = df_kh['Thangsx'].apply(parse_thang)  # da doi sang Ngaynhapkho
+    # Xu ly cot Tenjp
     if 'Tenjp' not in df_kh.columns:
         df_kh['Tenjp'] = ''
     else:
         df_kh['Tenjp'] = df_kh['Tenjp'].fillna('').astype(str).str.strip()
+    # Xu ly Ngaynhapkho: dd/mm/yyyy -> yyyy-MM-dd
+    if 'Ngaynhapkho' in df_kh.columns:
+        df_kh['Ngaynhapkho'] = pd.to_datetime(
+            df_kh['Ngaynhapkho'], format='%d/%m/%Y', errors='coerce'
+        ).dt.strftime('%Y-%m-%d')
+        df_kh['Ngaynhapkho'] = df_kh['Ngaynhapkho'].fillna('')
+    else:
+        df_kh['Ngaynhapkho'] = ''
     kh_records = df_kh.rename(columns={
         'Matp':'matp','Tentp':'tentp','Tenjp':'tenjp','Nhom':'nhom',
-        'To':'to','Soluong':'soluong_kh','Thangsx':'thangsx'
-    })[['matp','tentp','tenjp','nhom','to','soluong_kh','thangsx']].to_dict('records')
+        'To':'to','Soluong':'soluong_kh','Ngaynhapkho':'ngaynhapkho'
+    })[['matp','tentp','tenjp','nhom','to','soluong_kh','ngaynhapkho']].to_dict('records')
     print(f"KH_DATA loaded: {len(kh_records)} records")
 except Exception as e:
     kh_records = []
