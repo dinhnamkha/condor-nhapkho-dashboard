@@ -48,7 +48,10 @@ try:
     kh_vals = ws_kh.get_all_values()
     kh_headers = kh_vals[0]
     df_kh   = pd.DataFrame(kh_vals[1:], columns=kh_headers)
+    print(f"KH headers: {kh_headers}")
+    print(f"KH total rows: {len(df_kh)}")
     df_kh   = df_kh[df_kh['Matp'] != ''].copy()
+    print(f"KH rows after Matp filter: {len(df_kh)}")
     df_kh['Soluong'] = pd.to_numeric(
         df_kh['Soluong'].astype(str).str.replace('.', '', regex=False).str.replace(',', '.', regex=False),
         errors='coerce').fillna(0)
@@ -91,7 +94,9 @@ try:
     print(f"KH_DATA loaded: {len(kh_records)} records")
 except Exception as e:
     kh_records = []
+    import traceback
     print(f"WARNING: Kehoach sheet error: {e}")
+    traceback.print_exc()
 
 # 5. Serialize
 def serialize(obj):
