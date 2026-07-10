@@ -69,13 +69,20 @@ try:
         df_kh['Tenjp'] = ''
     else:
         df_kh['Tenjp'] = df_kh['Tenjp'].fillna('').astype(str).str.strip()
-    # Xu ly Ngaynhapkho: dd/mm/yyyy -> yyyy-MM-dd
-    if 'Ngaynhapkho' in df_kh.columns:
+    # Xu ly Ngaynhapkho: chap nhan ca 'Ngaynhapkho' va 'Ngaynhapl' (ten rut gon)
+    ngay_col = None
+    for col in ['Ngaynhapkho', 'Ngaynhapl', 'NgayNhapKho', 'Ngay nhap kho']:
+        if col in df_kh.columns:
+            ngay_col = col
+            break
+    if ngay_col:
+        print(f"Found date column: {ngay_col}")
         df_kh['Ngaynhapkho'] = pd.to_datetime(
-            df_kh['Ngaynhapkho'], format='%d/%m/%Y', errors='coerce'
+            df_kh[ngay_col], format='%d/%m/%Y', errors='coerce'
         ).dt.strftime('%Y-%m-%d')
         df_kh['Ngaynhapkho'] = df_kh['Ngaynhapkho'].fillna('')
     else:
+        print(f"WARNING: No date column found. Columns: {list(df_kh.columns)}")
         df_kh['Ngaynhapkho'] = ''
     kh_records = df_kh.rename(columns={
         'Matp':'matp','Tentp':'tentp','Tenjp':'tenjp','Nhom':'nhom',
