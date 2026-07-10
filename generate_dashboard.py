@@ -87,6 +87,9 @@ try:
     else:
         print(f"WARNING: No date column found. Columns: {list(df_kh.columns)}")
         df_kh['Ngaynhapkho'] = ''
+    # Nhom co the khong co trong sheet
+    if 'Nhom' not in df_kh.columns:
+        df_kh['Nhom'] = ''
     kh_records = df_kh.rename(columns={
         'Matp':'matp','Tentp':'tentp','Tenjp':'tenjp','Nhom':'nhom',
         'To':'to','Soluong':'soluong_kh','Ngaynhapkho':'ngaynhapkho'
